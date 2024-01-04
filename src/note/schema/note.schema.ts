@@ -7,6 +7,8 @@ export type NoteDocument = HydratedDocument<Note>;
 @Schema({ timestamps: true })
 export class Note {
   @Prop({ required: true })
+  title: string;
+  @Prop({ required: true })
   content: string;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })

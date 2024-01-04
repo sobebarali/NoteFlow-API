@@ -16,7 +16,7 @@ import { JwtStrategy } from './jwt/jwt.strategy';
         expiresIn: jwtConstants.expiresIn,
       },
     }),
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

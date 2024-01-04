@@ -29,10 +29,6 @@ describe('AuthService', () => {
     service = module.get<AuthService>(AuthService);
   });
 
-  afterAll(async () => {
-    // Add logic to drop the test database or clean up data
-  });
-
   it('should successfully register a new user', async () => {
     const newUser = {
       email: `test${Date.now()}@test.com`,
