@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { User } from '../../users/schema/users.schema';
 
 export type NoteDocument = HydratedDocument<Note>;
 
@@ -12,12 +11,12 @@ export class Note {
   content: string;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  createdBy: User;
+  createdBy: Types.ObjectId;
 
   @Prop()
   keywords: string[];
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
-  sharedWith: User[];
+  sharedWith: Types.Array<Types.ObjectId>;
 }
 export const NoteSchema = SchemaFactory.createForClass(Note);

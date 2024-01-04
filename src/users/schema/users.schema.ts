@@ -13,10 +13,7 @@ export class User {
   password: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Note' }] })
-  notes: Types.Array<Note>;
-
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }] })
-  sharedWith: Types.Array<User>;
+  notes: Types.Array<Types.ObjectId>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

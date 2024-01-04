@@ -8,6 +8,7 @@ import {
   Param,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 
 import { CreateNoteDto, UpdateNoteDto } from './dto/note.dto';
@@ -21,7 +22,7 @@ export class NoteController {
 
   @Get()
   async findAll(@Request() req) {
-    let userId = req.user._id.toString();
+    let userId = req.user._id;
     return this.noteService.findAll(userId);
   }
 
@@ -44,5 +45,21 @@ export class NoteController {
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return this.noteService.delete(id);
+  }
+
+  @Post(':id/share')
+  async shareNote(
+    @Param('id') noteId: string,
+    @Request() req,
+    @Body('userId') userId: string,
+  ) {
+    const ownerId = req.user._id.toString();
+    return this.noteService.shareNote(noteId, ownerId, userId);
+  }
+
+  @Get('search')
+  async searchNotes(@Request() req, @Query('q') query: string) {
+    let userId = req.user._id.toString();
+    return this.noteService.searchNotes(query, userId);
   }
 }

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Note, NoteDocument } from './schema/note.schema';
@@ -13,7 +17,15 @@ export class NoteService {
   ) {}
 
   async findAll(userId: string): Promise<Note[]> {
-    return this.noteModel.find({ createdBy: userId }).exec();
+    const user = await this.userModel.findById(userId, '-password').exec();
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    const notes = await this.noteModel.find({ createdBy: userId }).exec();
+
+    return notes;
   }
 
   async findOne(id: string): Promise<Note> {
@@ -25,9 +37,15 @@ export class NoteService {
   }
 
   async create(createNoteDto: CreateNoteDto, userId: string): Promise<Note> {
+    const user = await this.userModel.findById(userId, '-password').exec();
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
     let createDoc = {
       ...createNoteDto,
-      createdBy: userId,
+      createdBy: user._id,
     };
 
     const createdNote = new this.noteModel(createDoc);
@@ -55,6 +73,40 @@ export class NoteService {
   async update(id: string, updateNoteDto: UpdateNoteDto): Promise<Note> {
     return this.noteModel
       .findByIdAndUpdate(id, updateNoteDto, { new: true })
+      .exec();
+  }
+
+  async shareNote(
+    noteId: string,
+    ownerId: string,
+    userId: string,
+  ): Promise<Note> {
+    const note = await this.noteModel.findById(noteId).exec();
+    if (!note) {
+      throw new NotFoundException(`Note with ID ${noteId} not found`);
+    }
+    if (note.createdBy.toString() !== ownerId) {
+      throw new ForbiddenException(
+        "You don't have permission to share this note",
+      );
+    }
+
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    note.sharedWith.push(user._id);
+    await note.save();
+    return note;
+  }
+
+  async searchNotes(query: string, userId: string): Promise<Note[]> {
+    return this.noteModel
+      .find({
+        createdBy: userId,
+        keywords: { $in: [new RegExp(query, 'i')] },
+      })
       .exec();
   }
 }
