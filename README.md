@@ -25,6 +25,8 @@ NoteFlow API is a secure and scalable RESTful API designed for efficient managem
 - PUT /api/notes/:id: Update an existing note by ID for the authenticated user.
 - DELETE /api/notes/:id: Delete a note by ID for the authenticated user.
 - POST /api/notes/:id/share: Share a note with another user for the authenticated user
+- GET /api/search?q=:query: search for notes based on keywords for the authenticated user. (Yet to be Implemented)
+  - Implement text indexing and search functionality to enable users to search for notes based on keywords
 
 ## Getting Started
 
